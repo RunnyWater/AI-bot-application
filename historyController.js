@@ -7,7 +7,7 @@ function loadHistory(){
 
 // Загрузка истории пользователя из файла
 function loadUserHistory(userId){
-    let userData = loadHistory();
+    const userData = loadHistory();
     return userData[userId];
 }
 
@@ -32,4 +32,31 @@ function createObject(query, responses) {
         "response": responses,
         "id": genId()
     };
+}
+
+// Создание уникального ID для вопроса
+function genId(){}
+
+// Вывод ответа (если нужно)
+function handleRequest(query){
+
+}
+
+// Поиск вопроса по ID
+function searchById(userId, requestId){
+    const data = loadUserHistory(userId);
+    for(let req of data){
+        if(req.id == requestId)
+            return req;
+    }
+}
+
+// Поиск вопроса по Query
+// **Примитивная версия, где найти вопрос можно только знав его точно**
+function searchByQuery(userId, query){
+    const data = loadUserHistory(userId);
+    for(let req of data){
+        if(req.query == query)
+            return req;
+    }
 }

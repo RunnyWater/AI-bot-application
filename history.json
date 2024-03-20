@@ -1,11 +1,22 @@
 {
-    "UserId": {
-        "query": "Question?",
-        "response": ["ans1",
-                     "ans2",
-                     "ans3",
-                     "ans4",
-                     "ans5"],
-        "id": "KAfb3nlsoJSk5d6fnsj7dfj"
-    }
+    "UserId": [
+        {
+            "query": "Question?",
+            "response": ["ans1",
+                        "ans2",
+                        "ans3",
+                        "ans4",
+                        "ans5"],
+            "id": "KAfb3nlsoJSk5d6fnsj7dfj"
+        },
+        {
+            "query": "Question?",
+            "response": ["ans1",
+                        "ans2",
+                        "ans3",
+                        "ans4",
+                        "ans5"],
+            "id": "KAfb3nlsoJSk5d6fnsj7dfj"
+        }
+    ]
 }
