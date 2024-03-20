@@ -1,0 +1,128 @@
+* {border: 0;
+    border: 0;
+    padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+}
+.flex__general {
+    display: flex;
+    align-items: center;
+}
+.flex__general--between {
+    justify-content: center;
+}
+body {
+    background: #292929;
+    padding-top: 50px;
+}
+.container {
+    width: 100%;
+    border-bottom: 2px solid #ffffff;
+    border-top: 2px solid #ffffff;
+}
+.container__buttons {
+    justify-content: right;
+    gap: 30px;
+}
+.container__buttons button {
+    width: 200px;
+    height: 40px;
+    background-color: unset;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: 500;
+}
+.font__general {
+    font-family: 'Trebuchet MS', sans-serif;
+}
+.container__general {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 50px 0px 50px 0px;
+    position: relative;
+}
+.container__search {
+    text-align: center;
+    margin-bottom: 50px;
+}
+.container__title {
+    font-size: 40px;
+    font-weight: 500;
+    color: #fff;
+}
+.font__input {
+    width: 800px;
+    border-bottom: 2px solid #ffffff;
+    height: 50px;
+    background-color: unset;
+    padding-left: 20px;
+    font-size: 20px;
+    font-weight: 500;
+    outline: none;
+    margin-bottom: 50px;
+}
+.font__input::placeholder {
+    font-size: 20px;
+    font-weight: 500;
+    color: rgb(178, 178, 178);
+}
+.container__ai {
+    gap: 40px;
+}
+.container__answer {
+    width: 660px;
+    height: 200px;
+    border-bottom: 2px solid #ffffff;
+    padding: 20px;
+}
+.container__answer p {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: left;
+    color: rgb(178, 178, 178);
+}
+.container__ai h2 {
+    font-size: 40px;
+    font-weight: 500;
+}
+.general__button {
+    transition: all 0.3s linear;
+}
+.general__button:hover {
+    background-color: black;
+    color: rgba(203,234,255,1);
+}
+.container__login {
+    margin-bottom: 20px;
+}
+.container__history-button {
+    margin-bottom: 20px;
+}
+.container__buttons-general {
+    display: flex;
+    flex-direction: column;
+}
+.position__absolute {
+    position: absolute;
+    top: 50px;
+    left: 0;
+}
+.general__dnone {
+    display: none;
+}
+.container__history {
+    width: 200px;
+    border-bottom: 1px solid rgb(255, 255, 255);
+}
+.container__submit {
+    background-color: unset;
+    font-size: 25px;
+    cursor: pointer;
+}
+.container__history {
+    padding: 10px 0px;
+}
+.general__color--white {
+    color: #fff;
+}
