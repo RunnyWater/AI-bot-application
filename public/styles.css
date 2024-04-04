@@ -34,7 +34,7 @@ label {
 input[type="text"],
 input[type="password"],
 input[type="email"] {
-    width: calc(100% - 22px); /* Adjusted width to accommodate padding and border */
+    width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
@@ -60,3 +60,17 @@ button[type="submit"]:hover {
     color: red;
     margin-top: 5px;
 }
+.extra-links a {
+    color: rgb(110, 110, 110);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.extra-links a:hover {
+    text-decoration: underline;
+}
+.extra-links {
+    margin-bottom: 8px;
+    
+}
+
