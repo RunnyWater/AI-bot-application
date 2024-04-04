@@ -1,9 +1,12 @@
-const express = require('express');
-const mysql = require('mysql2');
-const bcrypt = require('bcrypt');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const path = require('path');
+import express from 'express';
+import mysql from 'mysql2';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
+import bodyParser from 'body-parser';
+import path from 'path';
+import mongodb from 'mongodb';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -13,6 +16,8 @@ app.use(session({
  saveUninitialized: true
 }));
 
+const connection_string = process.env.CONNECTION_STRING;
+
 const connection = mysql.createConnection({
  host: 'localhost',
  user: 'root',
@@ -20,9 +25,15 @@ const connection = mysql.createConnection({
  database: 'demo'
 });
 
-connection.connect(err => {
+const MongoClient = mongodb.MongoClient;
+const uri =connection_string // Replace with your MongoDB Atlas connection string
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+client.connect(err => {
  if (err) throw err;
- console.log('Connected to MySQL');
+ console.log('Connected to MongoDB');
+ const db = client.db(); // Specify your database name
+ // Now you can use `db` to interact with your database
 });
 
 
