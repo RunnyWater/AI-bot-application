@@ -42,7 +42,7 @@ input[type="email"] {
     box-sizing: border-box;
 }
 
-button[type="submit"] {
+button {
     width: 100%;
     padding: 10px;
     background-color: #4caf50;

@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
 <body>
     <div class="container">
         <h2>Login</h2>
-        <form action="/login" method="POST">
+        <form id="loginForm">
             <div>
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -17,7 +17,7 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div class="extra-links">
-                <a href="register.html">Sign up</a>
+                <a href=" register">Sign up</a>
             </div>
             <div>
                 <button type="submit">Login</button>
@@ -25,5 +25,6 @@
         
         </form>
     </div>
+    <script src="js/login.js"></script>
 </body>
 </html>

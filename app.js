@@ -1,102 +1,137 @@
-import express from 'express';
-import mysql from 'mysql2';
+import express, { json } from 'express';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
 import bodyParser from 'body-parser';
-import path from 'path';
-import mongodb from 'mongodb';
+import fs from 'fs';
+import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
+import { log } from 'console';
+import { type } from 'os';
 dotenv.config();
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
  secret: 'secret',
  resave: true,
  saveUninitialized: true
 }));
 
+let userId = 0;
+
 const connection_string = process.env.CONNECTION_STRING;
 
-const connection = mysql.createConnection({
- host: 'localhost',
- user: 'root',
- password: '12345',
- database: 'demo'
-});
-
-const MongoClient = mongodb.MongoClient;
 const uri =connection_string // Replace with your MongoDB Atlas connection string
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(uri);
+let db
+var user_count;
+async function connectToDatabase() {
+  try {
+     await client.connect();
+     console.log('Connected to MongoDB');
+     db = client.db('ai_extension'); // Specify your database name
+     user_count = await getUserCount();
+  } catch (err) {
+    console.error("Error connecting to MongoDB:", err);
+  }
+}
 
-client.connect(err => {
- if (err) throw err;
- console.log('Connected to MongoDB');
- const db = client.db(); // Specify your database name
- // Now you can use `db` to interact with your database
+async function getUserCount() {
+  try {
+    const count = await db.collection('users').countDocuments();
+    return count;
+  } catch (error) {
+      console.error("Error getting user count:", error);
+  }
+}
+
+connectToDatabase();
+
+
+
+app.post('/register', async (req, res) => {
+  const { username, password, email } = req.body;
+  console.log('register', username, password, email);
+  if (await usernameExists(username)) {
+    console.log("Username already exists");
+    res.send("1");
+  }else if (await emailExists(email)) {
+    console.log("Email already exists");
+    res.send("2");
+    
+  }else{// Hash the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+  try{
+      await db.collection('users').insertOne({ user_id : parseInt(user_count+1), username, password: hashedPassword, email });
+    }
+  catch{
+    "-1"
+  }
+  console.log('User registered successfully');
+  user_count++;
+  res.send("0");
+  }
 });
 
-
-
- app.post('/register', async (req, res) => {
-  const { username, password, email } = req.body;
-
-  const checkUsername = "SELECT * FROM accounts WHERE username = ?";
-  connection.query(checkUsername, [username], async (error, rows) => {
-     if (error) {
-       console.log("Error during login verification:", error);
-       return res.status(500).send("Server error");
-     }
-     if (rows.length > 0) {
-       return res.status(400).send("The login is already taken");
-     }
+async function getIdByUsername(username) {
+  try {
+     const user = await db.collection('users').findOne({ username });
+     return user.user_id;
+  } catch (error) {
+     console.error("Error getting user ID:", error);
+     throw error; // Rethrow the error to be handled by the caller
+  }
+}
  
-  
-     const checkEmail = "SELECT * FROM accounts WHERE email = ?";
-     connection.query(checkEmail, [email], async (error, rows) => {
-       if (error) {
-         console.log("Email verification error:", error);
-         return res.status(500).send("Server error");
-       }
-       if (rows.length > 0) {
-         return res.status(400).send("Email is already taken");
-       }
-       bcrypt.hash(password, 10, (err, hash) => {
-         if (err) throw err;
-         const sql = 'INSERT INTO accounts (username, password, email) VALUES (?, ?, ?)';
-         connection.query(sql, [username, hash, email], (err, result) => {
-           if (err) throw err;
-           res.redirect('/login');
-         });
-       });
-     });
-  });
- });
+async function usernameExists(username) {
+  try {
+     const user = await db.collection('users').findOne({ username });
+     return user !== null;
+  } catch (error) {
+     console.error("Error checking username:", error);
+     throw error; // Rethrow the error to be handled by the caller
+  }
+ }
  
- 
+ async function emailExists(email) {
+  try {
+     const user = await db.collection('users').findOne({ email });
+     return user !== null;
+  } catch (error) {
+     console.error("Error checking email:", error);
+     throw error; // Rethrow the error to be handled by the caller
+  }
+ }
 
 // Login route
-app.post('/login', (req, res) => {
- const { username, password } = req.body;
- const sql = 'SELECT * FROM accounts WHERE username = ?';
- connection.query(sql, [username], (err, result) => {
-    if (err) throw err;
-    if (result.length > 0) {
-      bcrypt.compare(password, result[0].password, (err, isMatch) => {
-        if (err) throw err;
-        if (isMatch) {
-          req.session.loggedin = true;
-          req.session.username = username;
-          res.send('Login successful');
-        } else {
-          res.send('Incorrect password');
-        }
-      });
-    } else {
-      res.send('User not found');
-    }
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  console.log('login', username, password);
+ 
+  if (!usernameExists(username)){
+    return res.send("1");
+  }
+  const user = await db.collection('users').findOne({ username });
+  try{
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+          if (err) {
+            res.send("1");
+          };
+          if (isMatch) {
+            userId = getIdByUsername(username);
+            res.send("0");
+          } else {
+            res.send("1");
+          }
+        });
+  }catch{
+    res.send("1");
+  }
  });
-});
+
+
+
 
 app.listen(3000, () => {
  console.log('Server started on port 3000');
@@ -104,11 +139,11 @@ app.listen(3000, () => {
 
 app.use(express.static('public'));
 
-app.get('/registration', (req, res) => {
- res.sendFile(path.join(__dirname, './public/register.html'));
+app.get('/register', (req, res) => {
+  res.send(fs.readFileSync('./views/register.html', 'utf8'));
 });
 
 app.get('/login', (req, res) => {
- res.sendFile(path.join(__dirname, './public/login.html'));
+  res.send(fs.readFileSync('./views/login.html', 'utf8'));
 });
 
