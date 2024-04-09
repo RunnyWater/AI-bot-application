@@ -75,11 +75,6 @@ app.post('/register', async (req, res) => {
   console.log('User registered successfully');
   user_count++;
   res.send("0");
-  // Generate JWT
-  const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '2h' });
-
-  // Send JWT to the client
-  res.send({ token });
   }
 });
 
@@ -138,17 +133,28 @@ app.post('/login', async (req, res) => {
 
   // Send JWT to the client
   res.send({ token });
+  localStorage.setItem('token', token);
+
         });
   }catch{
     res.send("1");
   }
  });
+ 
+ fetch('/protected-route', {
+  headers: {
+     'Authorization': `Bearer ${localStorage.getItem('token')}`
+  }
+ });
+
  app.use(expressJwt({ secret: SECRET_KEY, algorithms: ['HS256'] }));
+
  app.use(function (err, req, res, next) {
  if (err.name === 'UnauthorizedError') {
     res.status(401).send('Invalid token...');
  }
 });
+
 app.use(function (err, req, res, next) {
   if (err.name === 'UnauthorizedError') {
      res.status(401).send('Invalid token...');
