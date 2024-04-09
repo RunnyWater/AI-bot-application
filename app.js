@@ -7,6 +7,8 @@ import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import { log } from 'console';
 import { type } from 'os';
+import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
 dotenv.config();
 
 const app = express();
@@ -49,6 +51,8 @@ async function getUserCount() {
 connectToDatabase();
 
 
+const crypto = require('crypto');
+const SECRET_KEY = crypto.randomBytes(64).toString('hex');
 
 app.post('/register', async (req, res) => {
   const { username, password, email } = req.body;
@@ -71,6 +75,11 @@ app.post('/register', async (req, res) => {
   console.log('User registered successfully');
   user_count++;
   res.send("0");
+  // Generate JWT
+  const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '2h' });
+
+  // Send JWT to the client
+  res.send({ token });
   }
 });
 
@@ -124,9 +133,25 @@ app.post('/login', async (req, res) => {
           } else {
             res.send("1");
           }
+  // Generate JWT
+  const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '2h' });
+
+  // Send JWT to the client
+  res.send({ token });
         });
   }catch{
     res.send("1");
+  }
+ });
+ app.use(expressJwt({ secret: SECRET_KEY, algorithms: ['HS256'] }));
+ app.use(function (err, req, res, next) {
+ if (err.name === 'UnauthorizedError') {
+    res.status(401).send('Invalid token...');
+ }
+});
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+     res.status(401).send('Invalid token...');
   }
  });
 
